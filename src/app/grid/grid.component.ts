@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 
 @Component({
   selector: 'app-grid',
@@ -12,5 +12,5 @@ import { Component } from '@angular/core';
   styles: ``
 })
 export default class GridComponent {
- 
+
 }
