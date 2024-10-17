@@ -24,7 +24,8 @@ import {Queue} from 'queue-typescript';
                         'tile': true,
                         'wall': tile.isWall,
                         'start': tile.isStart,
-                        'end': tile.isEnd
+                        'end': tile.isEnd,
+                        'visited': tile.isVisited
                       }"
           (mousedown)="onMouseDown($event, tile)"
           (mouseenter)="onMouseEnter(tile)"
