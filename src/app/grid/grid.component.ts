@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, inject, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import Tile from "../shared/model/tile.model";
 import {NgClass, NgForOf} from "@angular/common";
 import {Queue} from 'queue-typescript';
@@ -36,6 +36,7 @@ import {Queue} from 'queue-typescript';
 
     </div>
 
+    <button (click)="generateRandomGrid()">Generate Random Grid</button>
     <button (click)="runAlgorithm()">Run Algorithm</button>
     <button (click)="resetGrid()">Reset Grid</button>
   `,
@@ -78,8 +79,6 @@ import {Queue} from 'queue-typescript';
   `]
 })
 export default class GridComponent implements OnInit {
-
-  private cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
 
   grid: Tile[][] = [];
 
@@ -198,9 +197,25 @@ export default class GridComponent implements OnInit {
     let current = endTile.previousTile;
     while (current && !current.isStart) {
       current.isPath = true;
-      this.cdr.detectChanges();
       await this.sleep(50); // Adjust delay as needed
       current = current.previousTile;
+    }
+  }
+
+  generateRandomGrid(density: number = 0.3) {
+    for (let row of this.grid) {
+      for (let tile of row) {
+        // Skip the start and end tiles
+        if (tile.isStart || tile.isEnd) {
+          tile.isWall = false;
+        } else {
+          tile.isWall = Math.random() < density;
+        }
+        // Reset other properties
+        tile.isVisited = false;
+        tile.isPath = false;
+        tile.previousTile = undefined;
+      }
     }
   }
 }
