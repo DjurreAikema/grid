@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, inject, OnInit} from '@angular/core';
 import Tile from "../shared/model/tile.model";
 import {NgClass, NgForOf} from "@angular/common";
 import {Queue} from 'queue-typescript';
@@ -25,7 +25,8 @@ import {Queue} from 'queue-typescript';
                         'wall': tile.isWall,
                         'start': tile.isStart,
                         'end': tile.isEnd,
-                        'visited': tile.isVisited
+                        'visited': tile.isVisited,
+                        'path': tile.isPath
                       }"
           (mousedown)="onMouseDown($event, tile)"
           (mouseenter)="onMouseEnter(tile)"
@@ -70,12 +71,15 @@ import {Queue} from 'queue-typescript';
     .visited {
       background-color: lightblue;
     }
+
     .path {
       background-color: yellow;
     }
   `]
 })
 export default class GridComponent implements OnInit {
+
+  private cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
 
   grid: Tile[][] = [];
 
@@ -133,29 +137,36 @@ export default class GridComponent implements OnInit {
   }
 
   async runAlgorithm() {
-    const visited = new Set();
+    const visited = new Set<Tile>();
     const queue = new Queue<Tile>();
     const startTile = this.grid[this.START_ROW][this.START_COL];
     queue.enqueue(startTile);
+    visited.add(startTile);
 
     while (queue.length) {
       const currentTile = queue.dequeue();
+
       if (currentTile.isEnd) {
-        // Path found
+        // Path found, backtrack to mark the shortest path
+        this.backtrackPath(currentTile);
         return;
       }
 
-      this.getNeighbors(currentTile).forEach(neighbor => {
+      const neighbors = this.getNeighbors(currentTile);
+      for (const neighbor of neighbors) {
         if (!visited.has(neighbor) && !neighbor.isWall) {
           visited.add(neighbor);
+          neighbor.previousTile = currentTile; // Set the previous tile
           queue.enqueue(neighbor);
-          // Optionally, mark the cell as visited for visualization
           neighbor.isVisited = true;
         }
-      });
+      }
 
       await this.sleep(10);
     }
+
+    // If we reach here, no path was found
+    alert('No path found!');
   }
 
   getNeighbors(tile: Tile): Tile[] {
@@ -173,12 +184,23 @@ export default class GridComponent implements OnInit {
   }
 
   resetGrid() {
-    this.grid.forEach(row => {
-      row.forEach(cell => {
-        cell.isWall = false;
-        cell.isVisited = false;
-        // Reset other properties as needed
+    this.grid.forEach((row) => {
+      row.forEach((tile) => {
+        tile.isWall = false;
+        tile.isVisited = false;
+        tile.isPath = false;
+        tile.previousTile = undefined;
       });
     });
+  }
+
+  async backtrackPath(endTile: Tile) {
+    let current = endTile.previousTile;
+    while (current && !current.isStart) {
+      current.isPath = true;
+      this.cdr.detectChanges();
+      await this.sleep(50); // Adjust delay as needed
+      current = current.previousTile;
+    }
   }
 }

@@ -5,4 +5,7 @@ export default interface Tile {
   isStart: boolean;
   isEnd: boolean;
   isVisited: boolean;
+
+  isPath?: boolean;
+  previousTile?: Tile;
 }
