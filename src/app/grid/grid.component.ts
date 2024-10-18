@@ -85,8 +85,8 @@ import {Queue} from 'queue-typescript';
 export default class GridComponent implements OnInit {
   grid: Tile[][] = [];
 
-  readonly ROWS = 21; // Must be odd
-  readonly COLS = 21; // Must be odd
+  readonly ROWS = 31; // Must be odd
+  readonly COLS = 31; // Must be odd
 
   START_ROW = 1;
   START_COL = 1;
@@ -173,7 +173,7 @@ export default class GridComponent implements OnInit {
         }
       }
 
-      await this.sleep(10);
+      await this.sleep(5);
       this.cdr.detectChanges();
     }
 
@@ -210,7 +210,7 @@ export default class GridComponent implements OnInit {
     while (current && !current.isStart) {
       current.isPath = true;
       this.cdr.detectChanges();
-      await this.sleep(50); // Adjust delay for animation effect
+      await this.sleep(25); // Adjust delay for animation effect
       current = current.previousTile;
     }
   }
@@ -295,7 +295,7 @@ export default class GridComponent implements OnInit {
 
         // Visualize the wall removal
         this.cdr.detectChanges();
-        await this.sleep(10);
+        await this.sleep(5);
       }
     }
   }
