@@ -4,6 +4,7 @@ import Tile from '../shared/model/tile.model';
 import {NgClass, NgForOf} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {Queue} from 'queue-typescript';
+import {sleep} from "../shared/helpers/sleep.helper";
 
 @Component({
   selector: 'app-grid',
@@ -130,7 +131,7 @@ export default class GridComponent implements OnInit {
         }
       }
 
-      await this.sleep(5);
+      await sleep(5);
       this.cdr.detectChanges();
     }
 
@@ -158,16 +159,12 @@ export default class GridComponent implements OnInit {
     return neighbors;
   }
 
-  sleep(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-
   async backtrackPath(endTile: Tile) {
     let current = endTile.previousTile;
     while (current && !current.isStart) {
       current.isPath = true;
       this.cdr.detectChanges();
-      await this.sleep(25); // Adjust delay for animation effect
+      await sleep(25); // Adjust delay for animation effect
       current = current.previousTile;
     }
   }
@@ -252,7 +249,7 @@ export default class GridComponent implements OnInit {
 
         // Visualize the wall removal
         this.cdr.detectChanges();
-        await this.sleep(5);
+        await sleep(5);
       }
     }
   }
