@@ -37,50 +37,7 @@ import {Queue} from 'queue-typescript';
       </div>
     </div>
   `,
-  styles: [
-    `
-      .grid {
-        display: flex;
-        flex-direction: column;
-        user-select: none;
-      }
-
-      .row {
-        display: flex;
-      }
-
-      .tile {
-        width: 20px;
-        height: 20px;
-        box-sizing: border-box;
-      }
-
-      .wall {
-        background-color: black;
-      }
-
-      .cell {
-        background-color: white;
-        border: 1px solid #ddd;
-      }
-
-      .start {
-        background-color: green;
-      }
-
-      .end {
-        background-color: red;
-      }
-
-      .visited {
-        background-color: lightblue;
-      }
-
-      .path {
-        background-color: yellow;
-      }
-    `,
-  ],
+  styleUrls: ['grid.component.scss'],
 })
 export default class GridComponent implements OnInit {
   grid: Tile[][] = [];
