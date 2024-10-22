@@ -5,6 +5,7 @@ import {NgClass, NgForOf} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {Queue} from 'queue-typescript';
 import {sleep} from "../shared/helpers/sleep.helper";
+import {shuffleArray} from "../shared/helpers/shuffle-array.helper";
 
 @Component({
   selector: 'app-grid',
@@ -208,7 +209,7 @@ export default class GridComponent implements OnInit {
     }
 
     // Shuffle walls
-    this.shuffleArray(walls);
+    shuffleArray(walls);
 
     // Process walls
     for (const wall of walls) {
@@ -252,16 +253,5 @@ export default class GridComponent implements OnInit {
         await sleep(5);
       }
     }
-  }
-
-  private shuffleArray(array: any[]) {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(this.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-  }
-
-  private random() {
-    return Math.random();
   }
 }
