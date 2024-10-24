@@ -12,16 +12,24 @@ import {GridRendererComponent} from "./ui/grid-renderer.component";
   standalone: true,
   imports: [NgForOf, NgClass, FormsModule, GridRendererComponent],
   template: `
-    <!-- Buttons -->
-    <button (click)="generateMaze()">Generate Maze</button>
-    <button (click)="runAlgorithm()">Run Algorithm</button>
-    <button (click)="resetGrid()">Reset Grid</button>
+    <div class="wrapper">
 
-    <app-grid-renderer
-      [grid]="grid"
-      (tileClicked)="toggleWall($event)"
-    />
+      <!-- Grid -->
+      <app-grid-renderer
+        [grid]="grid"
+        (tileClicked)="toggleWall($event)"
+      />
+
+      <!-- Controls -->
+      <button (click)="generateMaze()">Generate Maze</button>
+      <button (click)="runAlgorithm()">Run Algorithm</button>
+      <button (click)="resetGrid()">Reset Grid</button>
+
+    </div>
   `,
+  styles: [`
+
+  `],
 })
 export default class GridComponent implements OnInit {
   grid: Tile[][] = [];
