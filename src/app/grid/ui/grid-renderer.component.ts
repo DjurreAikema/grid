@@ -1,4 +1,4 @@
-import {Component, computed, effect, ElementRef, inject, input, InputSignal, output, OutputEmitterRef, Renderer2} from '@angular/core';
+import {Component, computed, effect, ElementRef, HostListener, inject, input, InputSignal, output, OutputEmitterRef, Renderer2} from '@angular/core';
 import {NgClass, NgForOf} from "@angular/common";
 import Tile from "../../shared/model/tile.model";
 
@@ -101,6 +101,11 @@ export class GridRendererComponent {
         this.updateTileSize();
       }
     });
+  }
+
+  @HostListener('window:resize')
+  onResize(): void {
+    this.updateTileSize();
   }
 
   // --- Functions
