@@ -7,9 +7,16 @@ import {RouterOutlet} from '@angular/router';
   standalone: true,
   imports: [CommonModule, RouterOutlet],
   template: `
-    <router-outlet></router-outlet>
+    <div class="wrapper">
+      <router-outlet></router-outlet>
+    </div>
   `,
-  styles: [],
+  styles: [`
+    .wrapper {
+      height: 100dvh;
+      width: 100dvw;
+    }
+  `],
 })
 export class AppComponent {
   title = 'grid';

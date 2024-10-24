@@ -31,7 +31,22 @@ import {GridControlsComponent} from "./ui/grid-controls.component";
     </div>
   `,
   styles: [`
+    .wrapper {
+      height: 100%;
+      width: 100%;
 
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap: 1rem;
+    }
+
+    app-grid-renderer {
+
+    }
+
+    app-grid-controls {
+
+    }
   `],
 })
 export default class GridComponent implements OnInit {
