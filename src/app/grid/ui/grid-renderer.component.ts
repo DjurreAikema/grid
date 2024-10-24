@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, computed, ElementRef, inject, input, InputSignal, output, OutputEmitterRef, Renderer2} from '@angular/core';
+import {Component, computed, effect, ElementRef, inject, input, InputSignal, output, OutputEmitterRef, Renderer2} from '@angular/core';
 import {NgClass, NgForOf} from "@angular/common";
 import Tile from "../../shared/model/tile.model";
 
@@ -77,7 +77,7 @@ import Tile from "../../shared/model/tile.model";
   `]
 })
 // Responsibility: TODO
-export class GridRendererComponent implements AfterViewInit {
+export class GridRendererComponent {
 
   private elementRef: ElementRef = inject(ElementRef);
   private renderer: Renderer2 = inject(Renderer2);
@@ -95,11 +95,15 @@ export class GridRendererComponent implements AfterViewInit {
   protected numberOfRows = computed(() => this.grid().length);
   protected numberOfCols = computed(() => this.grid().length > 0 ? this.grid()[0].length : 0);
 
-  // --- Functions
-  ngAfterViewInit(): void {
-    this.updateTileSize();
+  constructor() {
+    effect(() => {
+      if (this.grid() && this.numberOfRows() > 0 && this.numberOfCols() > 0) {
+        this.updateTileSize();
+      }
+    });
   }
 
+  // --- Functions
   protected onMouseDown(_: MouseEvent, tile: Tile): void {
     this.isMouseDown = true;
     this.tileClicked.emit(tile);
@@ -115,12 +119,12 @@ export class GridRendererComponent implements AfterViewInit {
 
   private updateTileSize(): void {
     const gridEl = this.elementRef.nativeElement.querySelector('.grid');
-    const gridWidth = gridEl.clientWidth;
-    const gridHeight = gridEl.clientHeight;
+    const gridWidth: number = gridEl.clientWidth;
+    const gridHeight: number = gridEl.clientHeight;
 
-    const tileWidth = gridWidth / this.numberOfCols();
-    const tileHeight = gridHeight / this.numberOfRows();
-    const tileSize = Math.min(tileWidth, tileHeight);
+    const tileWidth: number = gridWidth / this.numberOfCols();
+    const tileHeight: number = gridHeight / this.numberOfRows();
+    const tileSize: number = Math.min(tileWidth, tileHeight);
 
     const tiles = gridEl.querySelectorAll('.tile');
     tiles.forEach((tile: HTMLElement) => {
