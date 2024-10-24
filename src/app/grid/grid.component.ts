@@ -5,40 +5,23 @@ import {FormsModule} from '@angular/forms';
 import {Queue} from 'queue-typescript';
 import {sleep} from "../shared/helpers/sleep.helper";
 import {shuffleArray} from "../shared/helpers/shuffle-array.helper";
+import {GridRendererComponent} from "./ui/grid-renderer.component";
 
 @Component({
   selector: 'app-grid',
   standalone: true,
-  imports: [NgForOf, NgClass, FormsModule],
+  imports: [NgForOf, NgClass, FormsModule, GridRendererComponent],
   template: `
     <!-- Buttons -->
     <button (click)="generateMaze()">Generate Maze</button>
     <button (click)="runAlgorithm()">Run Algorithm</button>
     <button (click)="resetGrid()">Reset Grid</button>
 
-    <!-- Grid -->
-    <div class="grid" (mouseup)="onMouseUp()">
-      <!-- Row -->
-      <div class="row" *ngFor="let row of grid">
-        <!-- Tile -->
-        <div
-          *ngFor="let tile of row"
-          [ngClass]="{
-            tile: true,
-            wall: tile.isWall,
-            cell: tile.isCell && !tile.isWall,
-            start: tile.isStart,
-            end: tile.isEnd,
-            visited: tile.isVisited,
-            path: tile.isPath
-          }"
-          (mousedown)="onMouseDown($event, tile)"
-          (mouseenter)="onMouseEnter(tile)"
-        ></div>
-      </div>
-    </div>
+    <app-grid-renderer
+      [grid]="grid"
+      (tileClicked)="toggleWall($event)"
+    />
   `,
-  styleUrls: ['grid.component.scss'],
 })
 export default class GridComponent implements OnInit {
   grid: Tile[][] = [];
@@ -52,7 +35,6 @@ export default class GridComponent implements OnInit {
   END_ROW = this.ROWS - 2;
   END_COL = this.COLS - 2;
 
-  isMouseDown = false;
   private mazeGenerated = false;
 
   constructor(private cdr: ChangeDetectorRef) {
@@ -87,21 +69,6 @@ export default class GridComponent implements OnInit {
   toggleWall(tile: Tile) {
     if (!this.mazeGenerated && !tile.isStart && !tile.isEnd) {
       tile.isWall = !tile.isWall;
-    }
-  }
-
-  onMouseDown(event: MouseEvent, tile: Tile) {
-    this.isMouseDown = true;
-    this.toggleWall(tile);
-  }
-
-  onMouseUp() {
-    this.isMouseDown = false;
-  }
-
-  onMouseEnter(tile: Tile) {
-    if (this.isMouseDown) {
-      this.toggleWall(tile);
     }
   }
 
