@@ -1,4 +1,3 @@
-// grid.component.ts
 import {Component, OnInit, ChangeDetectorRef} from '@angular/core';
 import Tile from '../shared/model/tile.model';
 import {NgClass, NgForOf} from '@angular/common';
