@@ -1,4 +1,4 @@
-import {Component, input, InputSignal, output, OutputEmitterRef} from '@angular/core';
+import {AfterViewInit, Component, computed, ElementRef, inject, input, InputSignal, output, OutputEmitterRef, Renderer2} from '@angular/core';
 import {NgClass, NgForOf} from "@angular/common";
 import Tile from "../../shared/model/tile.model";
 
@@ -34,6 +34,9 @@ import Tile from "../../shared/model/tile.model";
   `,
   styles: [`
     .grid {
+      width: 100%;
+      height: 100%;
+
       display: flex;
       flex-direction: column;
       user-select: none;
@@ -44,8 +47,6 @@ import Tile from "../../shared/model/tile.model";
     }
 
     .tile {
-      width: 20px;
-      height: 20px;
       box-sizing: border-box;
     }
 
@@ -76,7 +77,10 @@ import Tile from "../../shared/model/tile.model";
   `]
 })
 // Responsibility: TODO
-export class GridRendererComponent {
+export class GridRendererComponent implements AfterViewInit {
+
+  private elementRef: ElementRef = inject(ElementRef);
+  private renderer: Renderer2 = inject(Renderer2);
 
   // --- Inputs
   grid: InputSignal<Tile[][]> = input.required<Tile[][]>();
@@ -88,8 +92,14 @@ export class GridRendererComponent {
   // --- Attributes
   private isMouseDown: boolean = false;
 
+  protected numberOfRows = computed(() => this.grid().length);
+  protected numberOfCols = computed(() => this.grid().length > 0 ? this.grid()[0].length : 0);
 
   // --- Functions
+  ngAfterViewInit(): void {
+    this.updateTileSize();
+  }
+
   protected onMouseDown(_: MouseEvent, tile: Tile): void {
     this.isMouseDown = true;
     this.tileClicked.emit(tile);
@@ -101,5 +111,21 @@ export class GridRendererComponent {
 
   protected onMouseEnter(tile: Tile): void {
     if (this.isMouseDown) this.tileClicked.emit(tile);
+  }
+
+  private updateTileSize(): void {
+    const gridEl = this.elementRef.nativeElement.querySelector('.grid');
+    const gridWidth = gridEl.clientWidth;
+    const gridHeight = gridEl.clientHeight;
+
+    const tileWidth = gridWidth / this.numberOfCols();
+    const tileHeight = gridHeight / this.numberOfRows();
+    const tileSize = Math.min(tileWidth, tileHeight);
+
+    const tiles = gridEl.querySelectorAll('.tile');
+    tiles.forEach((tile: HTMLElement) => {
+      this.renderer.setStyle(tile, 'width', `${tileSize}px`);
+      this.renderer.setStyle(tile, 'height', `${tileSize}px`);
+    });
   }
 }
