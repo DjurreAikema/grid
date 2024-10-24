@@ -6,11 +6,12 @@ import {Queue} from 'queue-typescript';
 import {sleep} from "../shared/helpers/sleep.helper";
 import {shuffleArray} from "../shared/helpers/shuffle-array.helper";
 import {GridRendererComponent} from "./ui/grid-renderer.component";
+import {GridControlsComponent} from "./ui/grid-controls.component";
 
 @Component({
   selector: 'app-grid',
   standalone: true,
-  imports: [NgForOf, NgClass, FormsModule, GridRendererComponent],
+  imports: [NgForOf, NgClass, FormsModule, GridRendererComponent, GridControlsComponent],
   template: `
     <div class="wrapper">
 
@@ -21,9 +22,11 @@ import {GridRendererComponent} from "./ui/grid-renderer.component";
       />
 
       <!-- Controls -->
-      <button (click)="generateMaze()">Generate Maze</button>
-      <button (click)="runAlgorithm()">Run Algorithm</button>
-      <button (click)="resetGrid()">Reset Grid</button>
+      <app-grid-controls
+        (generateMaze)="generateMaze()"
+        (runAlgorithm)="runAlgorithm()"
+        (resetGrid)="resetGrid()"
+      />
 
     </div>
   `,
