@@ -1,4 +1,4 @@
-import {Component, OnInit, ChangeDetectorRef} from '@angular/core';
+import {Component, OnInit, ChangeDetectorRef, inject} from '@angular/core';
 import Tile from '../shared/model/tile.model';
 import {NgClass, NgForOf} from '@angular/common';
 import {FormsModule} from '@angular/forms';
@@ -7,6 +7,7 @@ import {sleep} from "../shared/helpers/sleep.helper";
 import {shuffleArray} from "../shared/helpers/shuffle-array.helper";
 import {GridRendererComponent} from "./ui/grid-renderer.component";
 import {GridControlsComponent} from "./ui/grid-controls.component";
+import {GridService} from "./data-access/grid.service";
 
 @Component({
   selector: 'app-grid',
@@ -17,7 +18,7 @@ import {GridControlsComponent} from "./ui/grid-controls.component";
 
       <!-- Grid -->
       <app-grid-renderer
-        [grid]="grid"
+        [grid]="gridService.grid()"
         (tileClicked)="toggleWall($event)"
       />
 
@@ -50,6 +51,9 @@ import {GridControlsComponent} from "./ui/grid-controls.component";
   `],
 })
 export default class GridComponent implements OnInit {
+
+  protected gridService: GridService = inject(GridService);
+
   grid: Tile[][] = [];
 
   readonly ROWS = 31; // Must be odd

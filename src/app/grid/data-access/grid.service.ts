@@ -1,4 +1,4 @@
-import {computed, Injectable, Signal, signal, WritableSignal} from '@angular/core';
+import {computed, effect, Injectable, Signal, signal, WritableSignal} from '@angular/core';
 import Tile from "../../shared/model/tile.model";
 import {map, merge, Observable, of, Subject} from "rxjs";
 import {connect} from "ngxtension/connect";
@@ -56,6 +56,13 @@ export class GridService {
 
     connect(this.state)
       .with(nextState$);
+
+    // --- Effects
+    effect(() => {
+      // if (this.numberOfCols() > 0 && this.numberOfRows() > 0) {
+      //   this.resetGrid$.next();
+      // }
+    });
   }
 
   // --- Functions
