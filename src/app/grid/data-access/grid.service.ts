@@ -1,6 +1,6 @@
 import {computed, effect, Injectable, Signal, signal, WritableSignal} from '@angular/core';
 import Tile from "../../shared/model/tile.model";
-import {map, merge, Observable, of, Subject} from "rxjs";
+import {map, merge, Observable, of, startWith, Subject, switchMap} from "rxjs";
 import {connect} from "ngxtension/connect";
 
 // State interface
@@ -12,6 +12,7 @@ export interface GridState {
   startRow: number;
   endCol: number;
   endRow: number;
+  loading: boolean;
 }
 
 @Injectable({
@@ -26,8 +27,9 @@ export class GridService {
     numberOfRows: 31,
     startCol: 1,
     startRow: 1,
-    endCol: 1,
-    endRow: 1
+    endCol: 31 - 2,
+    endRow: 31 - 2,
+    loading: true
   });
 
   // --- Selectors
@@ -41,16 +43,23 @@ export class GridService {
   public endCol: Signal<number> = computed(() => this.state().endCol);
   public endRow: Signal<number> = computed(() => this.state().endRow);
 
+  public loading: Signal<boolean> = computed(() => this.state().loading);
+
   // --- Sources
   public resetGrid$: Subject<void> = new Subject<void>();
 
-  private generateGrid$: Observable<Tile[][]> = this.createGrid();
+  // private girdGenerated$: Observable<Tile[][]> = this.createGrid();
+  private girdGenerated$: Observable<Tile[][]> = this.resetGrid$.pipe(
+    startWith(void 0),
+    switchMap(() => this.createGrid())
+  );
 
   // --- Reducers
   constructor() {
     const nextState$ = merge(
-      this.generateGrid$.pipe(map((grid) => ({
-        grid: grid
+      this.girdGenerated$.pipe(map((grid) => ({
+        grid: grid,
+        loading: false
       }))),
     );
 
@@ -89,6 +98,7 @@ export class GridService {
       grid.push(currentRow);
     }
 
+    console.log('done')
     return of(grid);
   }
 }

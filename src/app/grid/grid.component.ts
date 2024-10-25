@@ -2,7 +2,6 @@ import {Component, OnInit, ChangeDetectorRef, inject} from '@angular/core';
 import Tile from '../shared/model/tile.model';
 import {NgClass, NgForOf} from '@angular/common';
 import {FormsModule} from '@angular/forms';
-import {Queue} from 'queue-typescript';
 import {sleep} from "../shared/helpers/sleep.helper";
 import {shuffleArray} from "../shared/helpers/shuffle-array.helper";
 import {GridRendererComponent} from "./ui/grid-renderer.component";
@@ -24,9 +23,8 @@ import {GridService} from "./data-access/grid.service";
 
       <!-- Controls -->
       <app-grid-controls
-        (generateMaze)="generateMaze()"
-        (runAlgorithm)="runAlgorithm()"
-        (resetGrid)="resetGrid()"
+        (generateMaze)="generateMaze(gridService.grid(), gridService.numberOfRows(), gridService.numberOfCols())"
+        (resetGrid)="gridService.resetGrid$.next()"
       />
 
     </div>
@@ -54,16 +52,16 @@ export default class GridComponent implements OnInit {
 
   protected gridService: GridService = inject(GridService);
 
-  grid: Tile[][] = [];
+  // grid: Tile[][] = [];
 
-  readonly ROWS = 31; // Must be odd
-  readonly COLS = 31; // Must be odd
+  // readonly ROWS = 31; // Must be odd
+  // readonly COLS = 31; // Must be odd
 
-  START_ROW = 1;
-  START_COL = 1;
+  // START_ROW = 1;
+  // START_COL = 1;
 
-  END_ROW = this.ROWS - 2;
-  END_COL = this.COLS - 2;
+  // END_ROW = this.ROWS - 2;
+  // END_COL = this.COLS - 2;
 
   private mazeGenerated = false;
 
@@ -71,30 +69,30 @@ export default class GridComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.createGrid();
+    // this.createGrid();
   }
 
-  private createGrid() {
-    this.grid = [];
-    for (let i = 0; i < this.ROWS; i++) {
-      const currentRow: Tile[] = [];
-      for (let j = 0; j < this.COLS; j++) {
-        const isCell = i % 2 !== 0 && j % 2 !== 0;
-        currentRow.push({
-          row: i,
-          col: j,
-          isWall: !isCell,
-          isCell: isCell,
-          isStart: i === this.START_ROW && j === this.START_COL,
-          isEnd: i === this.END_ROW && j === this.END_COL,
-          isVisited: false,
-          isPath: false,
-          previousTile: undefined,
-        });
-      }
-      this.grid.push(currentRow);
-    }
-  }
+  // private createGrid() {
+  //   this.grid = [];
+  //   for (let i = 0; i < this.ROWS; i++) {
+  //     const currentRow: Tile[] = [];
+  //     for (let j = 0; j < this.COLS; j++) {
+  //       const isCell = i % 2 !== 0 && j % 2 !== 0;
+  //       currentRow.push({
+  //         row: i,
+  //         col: j,
+  //         isWall: !isCell,
+  //         isCell: isCell,
+  //         isStart: i === this.START_ROW && j === this.START_COL,
+  //         isEnd: i === this.END_ROW && j === this.END_COL,
+  //         isVisited: false,
+  //         isPath: false,
+  //         previousTile: undefined,
+  //       });
+  //     }
+  //     this.grid.push(currentRow);
+  //   }
+  // }
 
   toggleWall(tile: Tile) {
     if (!this.mazeGenerated && !tile.isStart && !tile.isEnd) {
@@ -102,59 +100,59 @@ export default class GridComponent implements OnInit {
     }
   }
 
-  async runAlgorithm() {
-    const visited = new Set<Tile>();
-    const queue = new Queue<Tile>();
-    const startTile = this.grid[this.START_ROW][this.START_COL];
-    queue.enqueue(startTile);
-    visited.add(startTile);
+  // async runAlgorithm() {
+  //   const visited = new Set<Tile>();
+  //   const queue = new Queue<Tile>();
+  //   const startTile = this.grid[this.START_ROW][this.START_COL];
+  //   queue.enqueue(startTile);
+  //   visited.add(startTile);
+  //
+  //   while (queue.length) {
+  //     const currentTile = queue.dequeue();
+  //
+  //     if (currentTile.isEnd) {
+  //       // Path found, backtrack to mark the shortest path
+  //       await this.backtrackPath(currentTile);
+  //       return;
+  //     }
+  //
+  //     const neighbors = this.getNeighbors(currentTile);
+  //     for (const neighbor of neighbors) {
+  //       if (!visited.has(neighbor) && !neighbor.isWall) {
+  //         visited.add(neighbor);
+  //         neighbor.previousTile = currentTile; // Track the path
+  //         queue.enqueue(neighbor);
+  //         neighbor.isVisited = true;
+  //       }
+  //     }
+  //
+  //     await sleep(5);
+  //     this.cdr.detectChanges();
+  //   }
+  //
+  //   // If we reach here, no path was found
+  //   alert('No path found!');
+  // }
 
-    while (queue.length) {
-      const currentTile = queue.dequeue();
-
-      if (currentTile.isEnd) {
-        // Path found, backtrack to mark the shortest path
-        await this.backtrackPath(currentTile);
-        return;
-      }
-
-      const neighbors = this.getNeighbors(currentTile);
-      for (const neighbor of neighbors) {
-        if (!visited.has(neighbor) && !neighbor.isWall) {
-          visited.add(neighbor);
-          neighbor.previousTile = currentTile; // Track the path
-          queue.enqueue(neighbor);
-          neighbor.isVisited = true;
-        }
-      }
-
-      await sleep(5);
-      this.cdr.detectChanges();
-    }
-
-    // If we reach here, no path was found
-    alert('No path found!');
-  }
-
-  getNeighbors(tile: Tile): Tile[] {
-    const neighbors = [];
-    const {row, col} = tile;
-    const directions = [
-      [-1, 0], // Up
-      [1, 0],  // Down
-      [0, -1], // Left
-      [0, 1],  // Right
-    ];
-
-    for (const [dRow, dCol] of directions) {
-      const nRow = row + dRow;
-      const nCol = col + dCol;
-      if (nRow >= 0 && nRow < this.ROWS && nCol >= 0 && nCol < this.COLS) {
-        neighbors.push(this.grid[nRow][nCol]);
-      }
-    }
-    return neighbors;
-  }
+  // getNeighbors(tile: Tile): Tile[] {
+  //   const neighbors = [];
+  //   const {row, col} = tile;
+  //   const directions = [
+  //     [-1, 0], // Up
+  //     [1, 0],  // Down
+  //     [0, -1], // Left
+  //     [0, 1],  // Right
+  //   ];
+  //
+  //   for (const [dRow, dCol] of directions) {
+  //     const nRow = row + dRow;
+  //     const nCol = col + dCol;
+  //     if (nRow >= 0 && nRow < this.ROWS && nCol >= 0 && nCol < this.COLS) {
+  //       neighbors.push(this.grid[nRow][nCol]);
+  //     }
+  //   }
+  //   return neighbors;
+  // }
 
   async backtrackPath(endTile: Tile) {
     let current = endTile.previousTile;
@@ -168,19 +166,17 @@ export default class GridComponent implements OnInit {
 
   resetGrid() {
     this.mazeGenerated = false;
-    this.createGrid();
+    // this.createGrid();
     this.cdr.detectChanges();
   }
 
-  async generateMaze() {
-    this.resetGrid();
-
+  async generateMaze(grid: Tile[][], numberOfRows: number, numberOfCols: number) {
     this.mazeGenerated = true;
     // Initialize sets for each cell
     const cellSets = new Map<string, Set<string>>();
 
-    for (let i = 1; i < this.ROWS - 1; i += 2) {
-      for (let j = 1; j < this.COLS - 1; j += 2) {
+    for (let i = 1; i < numberOfRows - 1; i += 2) {
+      for (let j = 1; j < numberOfCols - 1; j += 2) {
         const cellKey = `${i}-${j}`;
         const cellSet = new Set<string>();
         cellSet.add(cellKey);
@@ -191,15 +187,15 @@ export default class GridComponent implements OnInit {
     // List all walls between cells
     const walls: Tile[] = [];
 
-    for (let i = 1; i < this.ROWS - 1; i += 2) {
-      for (let j = 1; j < this.COLS - 1; j += 2) {
+    for (let i = 1; i < numberOfRows - 1; i += 2) {
+      for (let j = 1; j < numberOfCols - 1; j += 2) {
         // Right wall
-        if (j + 2 < this.COLS) {
-          walls.push(this.grid[i][j + 1]);
+        if (j + 2 < numberOfCols) {
+          walls.push(grid[i][j + 1]);
         }
         // Bottom wall
-        if (i + 2 < this.ROWS) {
-          walls.push(this.grid[i + 1][j]);
+        if (i + 2 < numberOfRows) {
+          walls.push(grid[i + 1][j]);
         }
       }
     }
