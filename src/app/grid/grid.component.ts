@@ -1,4 +1,4 @@
-import {Component, OnInit, ChangeDetectorRef, inject} from '@angular/core';
+import {Component, ChangeDetectorRef, inject} from '@angular/core';
 import Tile from '../shared/model/tile.model';
 import {NgClass, NgForOf} from '@angular/common';
 import {FormsModule} from '@angular/forms';
@@ -48,7 +48,7 @@ import {GridService} from "./data-access/grid.service";
     }
   `],
 })
-export default class GridComponent implements OnInit {
+export default class GridComponent {
 
   protected gridService: GridService = inject(GridService);
 
@@ -66,10 +66,6 @@ export default class GridComponent implements OnInit {
   private mazeGenerated = false;
 
   constructor(private cdr: ChangeDetectorRef) {
-  }
-
-  ngOnInit() {
-    // this.createGrid();
   }
 
   // private createGrid() {
