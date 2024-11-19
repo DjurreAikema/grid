@@ -39,6 +39,7 @@ export default class GameOfLifeComponent implements AfterViewInit {
     setInterval(() => {
       this.nextGeneration();
     }, 10); // Update elke 100 milliseconden
+
   }
 
   initializeGame(): void {
